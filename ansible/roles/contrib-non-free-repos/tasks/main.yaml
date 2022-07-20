@@ -1,0 +1,13 @@
+---
+- name: Add contrib and non-free repositories
+  replace:
+    dest: /etc/apt/sources.list
+    regexp: '^(deb.+)(?<! contrib non-free)$'
+    replace: '\1 contrib non-free'
+
+- name: Packages update
+  apt:
+    upgrade: dist
+    update_cache: yes
+    autoremove: yes
+    autoclean: yes

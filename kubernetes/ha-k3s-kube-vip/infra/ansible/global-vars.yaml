@@ -1,0 +1,2 @@
+cluster_user: kube
+cluster_group: kube

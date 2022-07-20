@@ -1,0 +1,10 @@
+[k3s_servers]
+%{ for node in k3s_servers_inventory ~}
+${node.name} ansible_host=${node.default_ipv4_address}
+%{ endfor ~}
+
+[k3s_agents]
+%{ for node in k3s_agents_inventory ~}
+${node.name} ansible_host=${node.default_ipv4_address}
+%{ endfor ~}
+

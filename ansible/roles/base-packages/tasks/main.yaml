@@ -1,0 +1,10 @@
+---
+- name: Install ntp package
+  apt:
+    name: ntp
+    state: present
+
+- name: Install curl package
+  apt:
+    name: curl
+    state: present

@@ -1,0 +1,11 @@
+---
+- name: Install sudo package
+  apt:
+    name: sudo
+    state: present
+
+- name: Sudo passwordless for {{ custom_user }} user
+  lineinfile:
+    dest: /etc/sudoers
+    line: '{{ custom_user }} ALL=(ALL) NOPASSWD: ALL'
+    validate: 'visudo -cf %s'
