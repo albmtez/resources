@@ -7,6 +7,13 @@ Multiple nodes kubernetes cluster built using k3s. Kube-vip is used to asign the
 - kubectl (https://kubernetes.io/es/docs/tasks/tools/#kubectl)
 - k3sup (https://github.com/alexellis/k3sup)
 
+## Versions
+
+Versions used in this guide:
+
+- K3s: v1.24.3+k3s1
+- Kube-vip: v0.5.0
+
 ## Infrastructure definition
 
 - 3 server nodes:
