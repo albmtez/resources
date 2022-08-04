@@ -92,7 +92,7 @@ export KUBECONFIG=config.k3s.yaml
 kubectl get nodes
 ```
 
-We will install kube-vip in the first server node (**if no taints used, apply the file kube-vip-no-taint.yaml**).
+We will install kube-vip in the first server node.
 
 ```
 kubectl apply -f manifests/kube-vip-rbac.yaml
@@ -201,3 +201,4 @@ kube-vip manifest daemonset \
     --services \
     --inCluster
 ```
+*taint* option is used because we want the kube-vip pods been executed only in server nodes.
