@@ -92,11 +92,11 @@ export KUBECONFIG=config.k3s.yaml
 kubectl get nodes
 ```
 
-We will install kube-vip in the first server node.
+We will install kube-vip in the first server node (**if no taints used, apply the file kube-vip-no-taint.yaml**).
 
 ```
 kubectl apply -f manifests/kube-vip-rbac.yaml
-kubectl apply -f manifests/kube-vip.yaml
+kubectl apply -f manifests/kube-vip-taint.yaml
 ```
 
 Kube-vip is now installed and we should be able to ping de VIP (*ping 192.168.10.50*).
