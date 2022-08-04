@@ -4,7 +4,7 @@ metadata:
   creationTimestamp: null
   labels:
     app.kubernetes.io/name: kube-vip-ds
-    app.kubernetes.io/version: v0.4.4
+    app.kubernetes.io/version: v0.5.0
   name: kube-vip-ds
   namespace: kube-system
 spec:
@@ -16,7 +16,7 @@ spec:
       creationTimestamp: null
       labels:
         app.kubernetes.io/name: kube-vip-ds
-        app.kubernetes.io/version: v0.4.4
+        app.kubernetes.io/version: v0.5.0
     spec:
       affinity:
         nodeAffinity:
@@ -58,7 +58,9 @@ spec:
           value: "1"
         - name: address
           value: 192.168.10.50
-        image: ghcr.io/kube-vip/kube-vip:v0.4.4
+        - name: prometheus_server
+          value: :2112
+        image: ghcr.io/kube-vip/kube-vip:v0.5.0
         imagePullPolicy: Always
         name: kube-vip
         resources: {}
@@ -80,4 +82,3 @@ status:
   desiredNumberScheduled: 0
   numberMisscheduled: 0
   numberReady: 0
-
