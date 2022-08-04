@@ -13,6 +13,7 @@ Versions used in this guide:
 
 - K3s: v1.24.3+k3s1
 - Kube-vip: v0.5.0
+- MetalLB: v0.13.4
 
 ## Infrastructure definition
 
@@ -96,7 +97,7 @@ We will install kube-vip in the first server node.
 
 ```
 kubectl apply -f manifests/kube-vip-rbac.yaml
-kubectl apply -f manifests/kube-vip-taint.yaml
+kubectl apply -f manifests/kube-vip.yaml
 ```
 
 Kube-vip is now installed and we should be able to ping de VIP (*ping 192.168.10.50*).
@@ -163,7 +164,135 @@ curl http://192.168.10.50/demo
 
 ### Using MetalLB
 
-TODO
+We will create a cluster disabling the load balancer service and installing MetalLB instead.
+
+Install k3sup in the first server node:
+
+```
+k3sup install \
+    --host=192.168.10.51 \
+    --user=kube \
+    --k3s-version=v1.24.3+k3s1 \
+    --local-path=config.k3s.yaml \
+    --context k3s \
+    --cluster \
+    --tls-san 192.168.10.50 \
+    --k3s-extra-args="--disable servicelb --node-taint node-role.kubernetes.io/master=true:NoSchedule" \
+    --ssh-key infra/common/ssh_key/id_rsa
+```
+
+kubectl config file will be generated with the name *config.k3s.yaml".
+
+```
+export KUBECONFIG=config.k3s.yaml
+kubectl get nodes
+```
+
+We will install kube-vip in the first server node.
+
+```
+kubectl apply -f manifests/kube-vip-rbac.yaml
+kubectl apply -f manifests/kube-vip.yaml
+```
+
+Kube-vip is now installed and we should be able to ping de VIP (*ping 192.168.10.50*).
+
+Let's add the other two server nodes:
+
+```
+k3sup join \
+    --host=192.168.10.52 \
+    --server-user=kube \
+    --server-host=192.168.10.50 \
+    --user=kube \
+    --server \
+    --k3s-extra-args="--disable servicelb --node-taint node-role.kubernetes.io/master=true:NoSchedule" \
+    --ssh-key infra/common/ssh_key/id_rsa
+k3sup join \
+    --host=192.168.10.53 \
+    --server-user=kube \
+    --server-host=192.168.10.50 \
+    --user=kube \
+    --server \
+    --k3s-extra-args="--disable servicelb --node-taint node-role.kubernetes.io/master=true:NoSchedule" \
+    --ssh-key infra/common/ssh_key/id_rsa
+```
+
+*Note that we are using the VIP as the server host ip address to join the rest of the nodes.*
+
+We have now a cluster with 3 server nodes. Let's add the 3 agent nodes:
+
+```
+k3sup join \
+    --host=192.168.10.54 \
+    --server-user=kube \
+    --server-host=192.168.10.50 \
+    --user=kube \
+    --ssh-key infra/common/ssh_key/id_rsa
+k3sup join \
+    --host=192.168.10.55 \
+    --server-user=kube \
+    --server-host=192.168.10.50 \
+    --user=kube \
+    --ssh-key infra/common/ssh_key/id_rsa
+k3sup join \
+    --host=192.168.10.56 \
+    --server-user=kube \
+    --server-host=192.168.10.50 \
+    --user=kube \
+    --ssh-key infra/common/ssh_key/id_rsa
+```
+
+All server and agent nodes are now ready. We can install and configure MetalLB:
+
+```
+# Install MetalLB
+kubectl apply -f manifests/metallb-native.yaml
+
+# Create the ip address pool
+kubectl apply -f manifests/metallb-ipaddresspool.yaml
+
+# Create de L2 advertisement
+kubectl apply -f manifests/metallb-l2advertisement.yaml
+```
+
+Now, we should see an external ip address assigned to the Traefik LB:
+
+```
+kubectl get svc -n kube-system
+NAME             TYPE           CLUSTER-IP      EXTERNAL-IP    PORT(S)                      AGE
+kube-dns         ClusterIP      10.43.0.10      <none>         53/UDP,53/TCP,9153/TCP       35m
+metrics-server   ClusterIP      10.43.203.199   <none>         443/TCP                      35m
+traefik          LoadBalancer   10.43.139.109   192.168.1.80   80:30877/TCP,443:30612/TCP   10m
+```
+
+We can now test it creating a simple deployment and an ingress:
+
+```
+kubectl apply -f manifests/demo-ingress.yaml
+```
+
+Repeat the following curl to see a different pod responding on every request:
+
+```
+curl http://192.168.10.80/demo
+```
+
+Another test:
+
+```
+# Create de deployment
+kubectl create deploy demo2 --image monachus/rancher-demo --port 8080 --replicas=3
+
+# Expose
+kubectl expose deploy demo2 --type=LoadBalancer --port=80 --target-port=8080
+
+# Check the external ip assigned
+kubectl get svc | grep demo2
+demo2        LoadBalancer   10.43.55.115   192.168.10.81   80:32222/TCP   96s
+```
+
+Open the url in your web browser: http://192.168.10.81
 
 ## Extra: Manifests generation
 
@@ -202,3 +331,35 @@ kube-vip manifest daemonset \
     --inCluster
 ```
 *taint* option is used because we want the kube-vip pods been executed only in server nodes.
+
+### MetalLB
+
+The manifest to install MetalLB can be downloaded directly from metallb site:
+
+```
+wget https://raw.githubusercontent.com/metallb/metallb/v0.13.4/config/manifests/metallb-native.yaml
+```
+
+Layer 2 configuration manifests can be copied from the docs: https://metallb.universe.tf/configuration/#layer-2-configuration
+
+```
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: first-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 192.168.1.240-192.168.1.250
+```
+
+```
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: example
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - first-pool
+```
