@@ -1,0 +1,11 @@
+groups:
+  - kube
+users:
+  - name: kube
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    primary_group: kube
+    lock_passwd: true
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCYKrhdBhRetN2ytim6arwpW0X2IYJ0h7px95azA3uHEQ8SEou9msGt3Sh4LLuoG3NxyuShZRuMosxnSJDyzurcXvBTgwWrUIpGM8N2sZzyUcCuMKDGlRcaXUGMcIe1vv8S/sAiEaqDV67V5a/PBAhRX/KneRps8iFgmIsDiFOs3uRRhl51tWaQlpsfY8BjHO1E/j9zL790WvzusnMEMb9kmYUuQkm4nRta3VbQcKniM8Gt2xJ4xXjmcNvnZ4N22YfiD0yIsiUxkHluMl8Fv2wKP0VmKIX6MTrRLoSpehTojEAxPZS2Qk0dkXlbHTeatnPunh4OwHRuYNXHruKxrPLcbQyX0r0xPerJHn9yvxAn/DU+wVf0WcCRDepd8l78qUw24uq/Uvae59x64T1hjtL0l6zfZfanV5CeyrfSS0aIzitLopdhHhMpyFMG9R+Q4zrP5uBVkgWyGAekbpN1bNg60Uk2bLSzDlkxFYlIDNQfeJY8LJCk5Ph7Ix+Ju47qU2k= kube
+
