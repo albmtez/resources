@@ -33,7 +33,7 @@ Feel free to adapt the configuration to your needs by modifying the file *infra/
 
 ### Terraform
 
-Terraform recipes are contained in *infra/terraform* folder. The vms will be created in Proxmox.
+Terraform recipes are contained in *infra/terraform* directory. The vms will be created in Proxmox.
 
 Just launch the following commands from the folder:
 
@@ -41,6 +41,14 @@ Just launch the following commands from the folder:
 terraform init
 terraform plan
 terraform apply
+```
+
+### Multipass
+
+You can create the vms using Multipass executing the script in *infra/multipass* directory:
+
+```
+./create_vms.sh
 ```
 
 ## Base configuration
