@@ -37,12 +37,13 @@ metadata:
 
 spec:
   rules:
-    - http:
+    - host: test.192.168.10.50.sslip.io
+      http:
         paths:
-          - path: /demo
-            pathType: Prefix
-            backend:
-              service:
-                name: demo
-                port:
-                  number: 8080
+        - pathType: Prefix
+          path: "/"
+          backend:
+            service:
+              name: demo
+              port:
+                number: 8080

@@ -164,11 +164,7 @@ We can check it creating a simple deployment and an ingress:
 kubectl apply -f manifests/demo-ingress.yaml
 ```
 
-Repeat the following curl to see a different pod responding on every request:
-
-```
-curl http://192.168.10.50/demo
-```
+Open the following url in your browser: http://test.192.168.10.50.sslip.io
 
 ### Using MetalLB
 
@@ -280,13 +276,9 @@ We can now test it creating a simple deployment and an ingress:
 kubectl apply -f manifests/demo-ingress.yaml
 ```
 
-Repeat the following curl to see a different pod responding on every request:
+Open the following url in your browser: http://test.192.168.10.50.sslip.io
 
-```
-curl http://192.168.10.80/demo
-```
-
-Another test:
+Another test exposing the service through the Load Balancer:
 
 ```
 # Create de deployment
