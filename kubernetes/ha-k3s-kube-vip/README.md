@@ -75,7 +75,7 @@ ssh -i infra/common/ssh_key/id_rsa kube@<node_ip>
 
 We'll use k3sup to install k3s remotely on each node and to join the nodes to the cluster.
 
-By default, the commands shown in this section use a node taint in order to not schedule pods execution in the control plane nodes. If you want your nodes to be executed in server nodes remove this configuracion in *k3s-extra-args*.
+By default, the commands shown in this section use a node taint in order to not schedule pods execution in the control plane nodes. If you want your nodes to be executed in server nodes remove this configuration in *k3s-extra-args*.
 
 ### Using Klipper default k3s Load Balancer
 
