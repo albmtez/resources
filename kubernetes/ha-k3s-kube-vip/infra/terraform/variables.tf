@@ -6,7 +6,7 @@ variable "pm_host" {
 
 variable "target_node" {
   type        = string
-  default     = "filemon"
+  default     = "mortadelo"
   description = "Proxmox target node"
 }
 
