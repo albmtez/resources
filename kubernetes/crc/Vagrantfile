@@ -1,0 +1,104 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# VM memory.
+vm_memory = 10240
+# VM number of cpus.
+vm_cpus = 4
+# VM IP
+vm_ip = "192.168.121.11"
+
+Vagrant.configure("2") do |config|
+
+  config.vm.define :server do |server|
+    server.vm.box = "centos/8"
+    server.vm.hostname = "crc"
+
+    server.vm.network "private_network", ip: "#{vm_ip}"
+
+    server.vm.provider :libvirt do |libvirt|
+      libvirt.cpu_mode = "host-passthrough"
+      libvirt.memory = "#{vm_memory}"
+      libvirt.cpus = "#{vm_cpus}"
+      libvirt.machine_virtual_size = 60
+    end
+
+    server.vm.provider :virtualbox do |vb|
+      vb.gui = false
+      vb.name = "CRC_OCP"
+      vb.memory = "#{vm_memory}"
+      vb.cpus = "#{vm_cpus}"
+    end
+
+    # Resize storage to use all available disk size
+    server.vm.provision "shell", inline: <<-SHELL
+      sed -i -e "s|mirrorlist=|#mirrorlist=|g" /etc/yum.repos.d/CentOS-*
+      sed -i -e "s|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g" /etc/yum.repos.d/CentOS-*
+      dnf install -y cloud-utils-growpart
+      growpart /dev/vda 1
+      xfs_growfs /dev/vda1
+    SHELL
+
+    # Copy CRC binary file, setup and start OCP instance.
+    server.vm.provision "shell", inline: <<-SHELL
+      cp /vagrant/crc /usr/bin
+      chmod +r+x /usr/bin/crc
+      mkdir /home/vagrant/.crc
+      tee /home/vagrant/.crc/crc.json &>/dev/null <<EOF
+{
+  "consent-telemetry": "no"
+}
+EOF
+      chown -R vagrant:vagrant /home/vagrant/.crc
+      sudo -H -u vagrant bash -c 'crc setup' 
+      sudo -H -u vagrant bash -c 'crc start -c 4 -m 9216 -d 50 -p /vagrant/pull-secret.txt'
+    SHELL
+
+    # Firewall and HAProxy configuration
+    server.vm.provision "shell", inline: <<-SHELL
+      dnf install -y haproxy /usr/sbin/semanage net-tools
+      systemctl enable --now firewalld
+      firewall-cmd --add-service=http --permanent
+      firewall-cmd --add-service=https --permanent
+      firewall-cmd --add-service=kube-apiserver --permanent
+      firewall-cmd --reload
+      semanage port -a -t http_port_t -p tcp 6443
+      cp /etc/haproxy/haproxy.cfg{,.bak}
+      export CRC_IP=$(sudo -H -u vagrant bash -c 'crc ip')
+      echo "CRC_IP=$CRC_IP"
+      tee /etc/haproxy/haproxy.cfg &>/dev/null <<EOF
+global
+    log /dev/log local0
+
+defaults
+    balance roundrobin
+    log global
+    maxconn 100
+    mode tcp
+    timeout connect 5s
+    timeout client 500s
+    timeout server 500s
+
+listen apps
+    bind 0.0.0.0:80
+    server crcvm $CRC_IP:80 check
+
+listen apps_ssl
+    bind 0.0.0.0:443
+    server crcvm $CRC_IP:443 check
+
+listen api
+    bind 0.0.0.0:6443
+    server crcvm $CRC_IP:6443 check
+EOF
+    systemctl enable haproxy
+    systemctl start haproxy
+    SHELL
+
+    # Show console credentials and server IP
+    server.vm.provision "shell", inline: <<-SHELL
+      sudo -H -u vagrant bash -c 'crc console --credentials'
+      echo "Server IP: $(ifconfig eth0 | grep 'inet ' | awk '{ print $2 }')"
+    SHELL
+  end
+end
