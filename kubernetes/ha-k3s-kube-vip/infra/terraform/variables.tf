@@ -23,8 +23,8 @@ variable "network" {
   type = map
   default = {
     "base_ip"    = "192.168.10."
-    "final_ip"   = "51"
-    "virtual_ip" = "50"
+    "final_ip"   = "101"
+    "virtual_ip" = "100"
     "net"        = "24"
     "gateway"    = "192.168.10.1"
   }
