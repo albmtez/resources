@@ -12,6 +12,25 @@ Go to the url https://cloud.redhat.com/openshift/create/local and download your 
 
 ### Using vagrant
 
+#### Pre-requisites
+
+The following Vagrant plugins are needed (`vagran plugin install <plugin_name>`):
+
+- vagrant-disksize
+- vagrant-libvirt
+- vagrant-mutate
+- vagrant-reload
+
+If you're using Virtualbox in Linux, edit the file `/etc/vbox/networks.conf` (create this file if it doesn't exist), adding the following line:
+
+```
+* 10.0.0.0/24
+```
+
+This configuration is needed to be able to use the network `10.0.0.0/24` to assign the IP address to the VM.
+
+#### Create your VM
+
 If libvirt is your preference just run:
 
 ```
@@ -34,10 +53,10 @@ Access the OpenShift Container Platform cluster running in the CRC instance by u
 
 The client machine is the remote laptop from which the user will connect to OpenShift. As CRC is using some internal DNS names and normally sets them in the local hosts file, these need to be added on the client machine. As IP, use the IP address of your server that runs CRC.
 
-Add the following line to your `/etc/hosts` file, using the IP address of your server.
+Add the following line to your `/etc/hosts` file:
 
 ```
-192.168.0.221 api.crc.testing console-openshift-console.apps-crc.testing default-route-openshift-image-registry.apps-crc.testing oauth-openshift.apps-crc.testing
+10.0.0.20 api.crc.testing console-openshift-console.apps-crc.testing default-route-openshift-image-registry.apps-crc.testing oauth-openshift.apps-crc.testing
 ```
 
 *Remember adding a new entry for each route or app deployed in OpenShift.*
