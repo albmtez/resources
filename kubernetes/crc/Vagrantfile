@@ -162,6 +162,7 @@ systemctl enable haproxy
 systemctl restart haproxy
 
 # # Show console credentials and server IP
+apt install -y net-tools
 sudo -H -u vagrant bash -c 'crc console --credentials'
 echo "Server IP: $(ifconfig eth0 | grep 'inet ' | awk '{ print $2 }')"
 SCRIPT
