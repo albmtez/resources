@@ -11,7 +11,7 @@ Multiple nodes kubernetes cluster built using k3s. Kube-vip is used to asign the
 
 Versions used in this guide:
 
-- K3s: v1.24.3+k3s1
+- K3s: v1.25.7+k3s1
 - Kube-vip: v0.5.0
 - MetalLB: v0.13.4
 
@@ -85,7 +85,7 @@ Install k3sup in the first server node:
 k3sup install \
     --host=192.168.10.101 \
     --user=kube \
-    --k3s-version=v1.24.3+k3s1 \
+    --k3s-version=v1.25.7+k3s1 \
     --local-path=config.k3s.yaml \
     --context k3s \
     --cluster \
@@ -116,6 +116,7 @@ Let's add the other two server nodes:
 k3sup join \
     --host=192.168.10.102 \
     --server-user=kube \
+    --k3s-version=v1.25.7+k3s1 \
     --server-host=192.168.10.100 \
     --user=kube \
     --server \
@@ -124,6 +125,7 @@ k3sup join \
 k3sup join \
     --host=192.168.10.103 \
     --server-user=kube \
+    --k3s-version=v1.25.7+k3s1 \
     --server-host=192.168.10.100 \
     --user=kube \
     --server \
@@ -139,18 +141,21 @@ We have now a cluster with 3 server nodes. Let's add the 3 agent nodes:
 k3sup join \
     --host=192.168.10.104 \
     --server-user=kube \
+    --k3s-version=v1.25.7+k3s1 \
     --server-host=192.168.10.100 \
     --user=kube \
     --ssh-key infra/common/ssh_key/id_rsa
 k3sup join \
     --host=192.168.10.105 \
     --server-user=kube \
+    --k3s-version=v1.25.7+k3s1 \
     --server-host=192.168.10.100 \
     --user=kube \
     --ssh-key infra/common/ssh_key/id_rsa
 k3sup join \
     --host=192.168.10.106 \
     --server-user=kube \
+    --k3s-version=v1.25.7+k3s1 \
     --server-host=192.168.10.100 \
     --user=kube \
     --ssh-key infra/common/ssh_key/id_rsa
