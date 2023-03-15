@@ -57,7 +57,7 @@ spec:
         - name: vip_retryperiod
           value: "1"
         - name: address
-          value: 192.168.10.50
+          value: 192.168.10.100
         - name: prometheus_server
           value: :2112
         image: ghcr.io/kube-vip/kube-vip:v0.5.0

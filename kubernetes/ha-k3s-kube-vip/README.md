@@ -108,7 +108,7 @@ kubectl apply -f manifests/kube-vip-rbac.yaml
 kubectl apply -f manifests/kube-vip.yaml
 ```
 
-Kube-vip is now installed and we should be able to ping de VIP (*ping 192.168.10.50*).
+Kube-vip is now installed and we should be able to ping de VIP (*ping 192.168.10.100*).
 
 Let's add the other two server nodes:
 
