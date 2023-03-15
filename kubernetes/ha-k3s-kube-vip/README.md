@@ -25,7 +25,7 @@ Versions used in this guide:
     - cores: 2
     - memory: 4096MB
     - disk: 50GB
-- VIP: 192.168.10.50
+- VIP: 192.168.10.100
 
 Feel free to adapt the configuration to your needs by modifying the file *infra/terraform/variables.tf*.
 
@@ -83,13 +83,13 @@ Install k3sup in the first server node:
 
 ```
 k3sup install \
-    --host=192.168.10.51 \
+    --host=192.168.10.101 \
     --user=kube \
     --k3s-version=v1.24.3+k3s1 \
     --local-path=config.k3s.yaml \
     --context k3s \
     --cluster \
-    --tls-san 192.168.10.50 \
+    --tls-san 192.168.10.100 \
     --k3s-extra-args="--node-taint node-role.kubernetes.io/master=true:NoSchedule" \
     --ssh-key infra/common/ssh_key/id_rsa
 ```
@@ -114,17 +114,17 @@ Let's add the other two server nodes:
 
 ```
 k3sup join \
-    --host=192.168.10.52 \
+    --host=192.168.10.102 \
     --server-user=kube \
-    --server-host=192.168.10.50 \
+    --server-host=192.168.10.100 \
     --user=kube \
     --server \
     --k3s-extra-args="--node-taint node-role.kubernetes.io/master=true:NoSchedule" \
     --ssh-key infra/common/ssh_key/id_rsa
 k3sup join \
-    --host=192.168.10.53 \
+    --host=192.168.10.103 \
     --server-user=kube \
-    --server-host=192.168.10.50 \
+    --server-host=192.168.10.100 \
     --user=kube \
     --server \
     --k3s-extra-args="--node-taint node-role.kubernetes.io/master=true:NoSchedule" \
@@ -137,21 +137,21 @@ We have now a cluster with 3 server nodes. Let's add the 3 agent nodes:
 
 ```
 k3sup join \
-    --host=192.168.10.54 \
+    --host=192.168.10.104 \
     --server-user=kube \
-    --server-host=192.168.10.50 \
+    --server-host=192.168.10.100 \
     --user=kube \
     --ssh-key infra/common/ssh_key/id_rsa
 k3sup join \
-    --host=192.168.10.55 \
+    --host=192.168.10.105 \
     --server-user=kube \
-    --server-host=192.168.10.50 \
+    --server-host=192.168.10.100 \
     --user=kube \
     --ssh-key infra/common/ssh_key/id_rsa
 k3sup join \
-    --host=192.168.10.56 \
+    --host=192.168.10.106 \
     --server-user=kube \
-    --server-host=192.168.10.50 \
+    --server-host=192.168.10.100 \
     --user=kube \
     --ssh-key infra/common/ssh_key/id_rsa
 ```
@@ -164,7 +164,7 @@ We can check it creating a simple deployment and an ingress:
 kubectl apply -f manifests/demo-ingress.yaml
 ```
 
-Open the following url in your browser: http://test.192.168.10.50.sslip.io
+Open the following url in your browser: http://test.192.168.10.100.sslip.io
 
 ### Using MetalLB
 
@@ -174,13 +174,13 @@ Install k3sup in the first server node:
 
 ```
 k3sup install \
-    --host=192.168.10.51 \
+    --host=192.168.10.101 \
     --user=kube \
     --k3s-version=v1.24.3+k3s1 \
     --local-path=config.k3s.yaml \
     --context k3s \
     --cluster \
-    --tls-san 192.168.10.50 \
+    --tls-san 192.168.10.100 \
     --k3s-extra-args="--disable servicelb --node-taint node-role.kubernetes.io/master=true:NoSchedule" \
     --ssh-key infra/common/ssh_key/id_rsa
 ```
@@ -205,17 +205,17 @@ Let's add the other two server nodes:
 
 ```
 k3sup join \
-    --host=192.168.10.52 \
+    --host=192.168.10.102 \
     --server-user=kube \
-    --server-host=192.168.10.50 \
+    --server-host=192.168.10.100 \
     --user=kube \
     --server \
     --k3s-extra-args="--disable servicelb --node-taint node-role.kubernetes.io/master=true:NoSchedule" \
     --ssh-key infra/common/ssh_key/id_rsa
 k3sup join \
-    --host=192.168.10.53 \
+    --host=192.168.10.103 \
     --server-user=kube \
-    --server-host=192.168.10.50 \
+    --server-host=192.168.10.100 \
     --user=kube \
     --server \
     --k3s-extra-args="--disable servicelb --node-taint node-role.kubernetes.io/master=true:NoSchedule" \
@@ -228,21 +228,21 @@ We have now a cluster with 3 server nodes. Let's add the 3 agent nodes:
 
 ```
 k3sup join \
-    --host=192.168.10.54 \
+    --host=192.168.10.104 \
     --server-user=kube \
-    --server-host=192.168.10.50 \
+    --server-host=192.168.10.100 \
     --user=kube \
     --ssh-key infra/common/ssh_key/id_rsa
 k3sup join \
-    --host=192.168.10.55 \
+    --host=192.168.10.105 \
     --server-user=kube \
-    --server-host=192.168.10.50 \
+    --server-host=192.168.10.100 \
     --user=kube \
     --ssh-key infra/common/ssh_key/id_rsa
 k3sup join \
-    --host=192.168.10.56 \
+    --host=192.168.10.106 \
     --server-user=kube \
-    --server-host=192.168.10.50 \
+    --server-host=192.168.10.100 \
     --user=kube \
     --ssh-key infra/common/ssh_key/id_rsa
 ```
@@ -276,7 +276,7 @@ We can now test it creating a simple deployment and an ingress:
 kubectl apply -f manifests/demo-ingress.yaml
 ```
 
-Open the following url in your browser: http://test.192.168.10.50.sslip.io
+Open the following url in your browser: http://test.192.168.10.100.sslip.io
 
 Another test exposing the service through the Load Balancer:
 
@@ -310,7 +310,7 @@ In order to deploy kube-vip as a DaemonSet we will use the docker image to gener
 
 ```
 # export cluster specific configuration
-export VIP=192.168.10.50
+export VIP=192.168.10.100
 export INTERFACE=eth0
 
 # fetch image
