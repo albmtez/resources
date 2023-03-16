@@ -37,7 +37,7 @@ metadata:
 
 spec:
   rules:
-    - host: test.192.168.10.50.sslip.io
+    - host: test.192.168.10.100.sslip.io
       http:
         paths:
         - pathType: Prefix
